@@ -9,6 +9,7 @@ import os, subprocess, signal, threading
 from util import is_root, countdown
 from time import sleep
 
+from config import probe_queue
 
 
 class probe_parser:
@@ -127,37 +128,32 @@ class probe_parser:
 
         print(new_config.interface)
         # Do all of the sniffing stuff
-        if new_config.mode == Mode.RAW:
-            from time import sleep
-            from my_raw import RawProbeRequestViewer
+        
+        from time import sleep
+        from my_raw import RawProbeRequestViewer
+        from test_probe_handler import My_RawProbeRequestViewer
 
-            try:
-                print("[*] Start sniffing probe requests...")
-                # Start the viewer module
-                raw_viewer = RawProbeRequestViewer(new_config)
-                raw_viewer.start()
+        try:
+            print("[*] Start sniffing probe requests...")
+            # Start the viewer module
+            raw_viewer = My_RawProbeRequestViewer(new_config)
+            raw_viewer.start()
 
-                while new_config.runtime > 0:
-                    sleep(1)
-                    logging.debug(f'Probe_queue Count {probe_queue.qsize()}')
-                    logging.debug(f"runtime: {new_config.runtime}")
-                    new_config.runtime -= 1
-                # Stop the Sniffing of packets
-                raw_viewer.stop()
-            except OSError:
-                raw_viewer.stop()
-                sys_exit(
-                    "[!] Interface {interface} doesn't exist".format(
-                        interface=config.interface
-                    )
+            while new_config.runtime > 0:
+                sleep(1)
+                logging.debug(f'Probe_queue Count {probe_queue.qsize()}')
+                logging.debug(f"runtime: {new_config.runtime}")
+                new_config.runtime -= 1
+            # Stop the Sniffing of packets
+            raw_viewer.stop()
+        except OSError:
+            raw_viewer.stop()
+            sys_exit(
+                "[!] Interface {interface} doesn't exist".format(
+                    interface=config.interface
                 )
-            except KeyboardInterrupt:
-                print("[*] Stopping the threads...")
-                raw_viewer.stop()
-                print("[*] Bye!")
-        else:
-            sys_exit("[x] Invalid mode")
-
+            )
+        
     def enqueue_probe(self, probe_req):
         # Enqueue the packet
         probe_queue.put(probe_req)
@@ -172,11 +168,12 @@ def print_queue():
     
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    #logging.basicConfig(level=logging.DEBUG)
     # Create a new parser Object
     temp = probe_parser('wlan0')
     # Start Capturing probe requests 
     temp.capture(60)
+    print_queue()
     temp.shutdown()
     print("-----SCRIPT END-----")
     
