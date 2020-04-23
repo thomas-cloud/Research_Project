@@ -15,9 +15,13 @@ class My_RawProbeRequestViewer(RawProbeRequestViewer):
     """
     def __init__(self, config):
 
+        # Open a log file
+        self.file = open('probe_log.txt', 'a')
+
         def store_probe(probe_req):
             # Enqueue the packet
             probe_queue.put(probe_req)
+            self.file.write(str(probe_req) + '\n')
 
         def print_probe(probe_req):
             print(probe_req)
@@ -33,6 +37,9 @@ class My_RawProbeRequestViewer(RawProbeRequestViewer):
 
             Removed the check for an output file.
         """
+        # Close the log file
+        if self.file is not None:
+            self.file.close()
 
         self.sniffer.stop()
 

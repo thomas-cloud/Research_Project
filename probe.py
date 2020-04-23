@@ -115,12 +115,13 @@ class probe_parser:
         from sys import exit as sys_exit
         from probequest.probe_request_sniffer import ProbeRequestSniffer
         from util import get_arg_parser
-        from my_PQ_config import Config, Mode
-        from pprint import pprint
         from config import probe_queue
 
+        from probequest.config import Mode
+        from probe_config import My_Config
+
         # Create a Config object
-        new_config = Config()
+        new_config = My_Config()
         
         # Manually Set the Config Options
         new_config.interface = str(self.interface) #interface to capture from
@@ -130,8 +131,7 @@ class probe_parser:
         # Do all of the sniffing stuff
         
         from time import sleep
-        from my_raw import RawProbeRequestViewer
-        from test_probe_handler import My_RawProbeRequestViewer
+        from probe_handler import My_RawProbeRequestViewer
 
         try:
             print("[*] Start sniffing probe requests...")
@@ -160,20 +160,13 @@ class probe_parser:
         # Increase the Packet count by 1
         #probe_count += 1
 
-def print_queue():
-    print("Printing Queue")
-    while not probe_queue.empty():
-        print(probe_queue.get())
-
-    
 
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.DEBUG)
     # Create a new parser Object
     temp = probe_parser('wlan0')
     # Start Capturing probe requests 
-    temp.capture(60)
-    print_queue()
+    temp.capture(60) #Replace with temp.start_capture()
     temp.shutdown()
     print("-----SCRIPT END-----")
     
