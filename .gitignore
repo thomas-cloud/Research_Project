@@ -4,3 +4,4 @@ settings.json
 __pycache__
 test*.py
 probequest_OLD
+probe_log.txt
