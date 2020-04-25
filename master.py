@@ -14,7 +14,8 @@ import probe, logging, subprocess, os
 
 #import the packet queue from the config module
 from config import probe_queue
-
+from probe import probe_parser
+from util import print_queue
 
 
 
@@ -29,16 +30,15 @@ class master:
     '''
         This function will run the startup.sh script to prepare the interface
     '''
-    def __init__(self, interface, **kwargs):
+    def __init__(self, **kwargs):
         """Creates the object, and sets the config options if specified"""
-        logging.basicConfig(level=logging.DEBUG)
+        #logging.basicConfig(level=logging.DEBUG)
         logging.debug("MASTER OBJECT CREATED")
 
         #check if the script is running as root
         #self.is_root()
 
         # Set the config options
-        self.interface = interface
         self.config(**kwargs)
         return
 
@@ -52,20 +52,45 @@ class master:
     def config(self, **kwargs):
         """Sets the basic configuration information"""
         for key, value in kwargs.items():
-            if key == "iface":
+            if key == "interface":
                 logging.debug(f"Iterface set to: {value}")
                 self.interface = value
-            elif key == "timeout":
-                logging.debug(f"Timeout set to: {value}")
-                self.timeout = int(value)
+            elif key == "capturetime":
+                logging.debug(f"Capturetime set to: {value}")
+                self.capturetime = int(value)
+
+        if not hasattr(self, 'interface'):
+            print("**Error, Requires Interface")
+            exit(1)
+        elif not hasattr(self, 'capturetime'):
+            logging.debug("Capturetime set to default: 300")
+            capturetime = 300
 
 
     def start_collecting(self):
         """Starts the collection of packets"""
-        self.collector = probe.probe_parser(self.interface)
+        # Create the probe parsing object
+        self.probe = probe_parser(self.interface)
+        # Start capturing probes
+        self.probe.capture(self.capturetime)
+        # Shutdown the Capture
+        self.probe.shutdown()
+
         return
 
+    def run(self):
+        # Start collecting probes in the queue
+        self.start_collecting()
+        # Print the queue
+        print_queue(probe_queue)
+'''
+        # Parse the packets into individual Files
+        self.parse()
+        self.geolocate()
+'''
 
 
-temp1 = master("wlan0", timeout=10)
+temp = master(interface="wlan0", capturetime=60)
+temp.run()
+print("SCRIPT END")
 
