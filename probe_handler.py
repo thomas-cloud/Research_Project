@@ -1,10 +1,11 @@
 """
     Overwriting of the Probequest classes used for probe sniffing, parsing, and handling
 """
-
+import json
 
 from probequest.ui.raw import RawProbeRequestViewer
 from config import probe_queue
+from device import device
 
 class My_RawProbeRequestViewer(RawProbeRequestViewer):
     """
@@ -108,4 +109,5 @@ class My_ProbeRequest(ProbeRequest):
         self.d_mac = d_mac
 
     def __str__(self):
-        return f'{self.timestamp},{self.d_mac},{self.s_mac},{self.essid}'
+        #return f'{self.timestamp},{self.d_mac},{self.s_mac},{self.essid}'
+        return json.dumps(self.__dict__)
