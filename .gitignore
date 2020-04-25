@@ -5,3 +5,4 @@ __pycache__
 test*
 probequest_OLD
 probe_log.txt
+devices.json
