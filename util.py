@@ -1,4 +1,4 @@
-import my_PQ_config, threading
+import threading
 
 def is_root():
     """
@@ -29,10 +29,10 @@ class countdown:
         print(f'{self.name}, Done.')
 
 
-def print_queue():
+def print_queue(pQueue):
     print("Printing Queue")
-    while not probe_queue.empty():
-        print(probe_queue.get())
+    while not pQueue.empty():
+        print(pQueue.get())
 
 
 def get_arg_parser():
@@ -114,6 +114,13 @@ def get_arg_parser():
     )
 
     return arg_parser
+
+
+def save_dict(data:dict, filename:str):
+    with open(filename, 'w') as f:
+        json_string = json.dumps(devices)
+        json.dump(json_string, f)
+
 
 
 if __name__ == '__main__':
