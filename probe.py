@@ -4,12 +4,14 @@
 
 #import the Scapy library to parse the packets
 from scapy.all import *
-import os, subprocess, signal, threading
+import os, subprocess, signal, threading, logging
 #import the packet queue from the config module
-from util import is_root, countdown
+from util import is_root, countdown, print_queue
 from time import sleep
 
 from config import probe_queue
+
+from device import device
 
 
 class probe_parser:
@@ -35,7 +37,7 @@ class probe_parser:
     def __del__(self):
         """ Do Cleanup"""
         # Run cleanup scripts.
-        #self.shutdown()
+        self.shutdown()
         return
     
     def startup(self):
@@ -87,6 +89,7 @@ class probe_parser:
         # Take the interface out of promiscuious mode
         logging.debug("+Returning Interface to Managed Mode")
         proc_output = subprocess.check_output(['airmon-ng', 'stop', 'wlan0'])
+        c = countdown("Returning Interface to managed mode", 5)
         if 'disabled' in str(proc_output):
             logging.debug(f"Monitor mode disabled: {self.interface}")
         
@@ -166,8 +169,9 @@ if __name__ == '__main__':
     # Create a new parser Object
     temp = probe_parser('wlan0')
     # Start Capturing probe requests 
-    temp.capture(60) #Replace with temp.start_capture()
+    temp.capture(5) #Replace with temp.start_capture()
     temp.shutdown()
+    print_queue(probe_queue)
     print("-----SCRIPT END-----")
     
     
